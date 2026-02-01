@@ -46,7 +46,7 @@ module.exports = {
       }
 
 
-      if (["imgbb", "i", "--i"].includes(input)) {
+      if (["imgbb", "img", " ibb"].includes(input)) {
         let msg = `✅ | Here is your imgbb url <😘\n\n`;
         for (const att of messageReply.attachments) {
         num++;
