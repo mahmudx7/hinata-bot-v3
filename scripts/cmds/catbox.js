@@ -8,7 +8,7 @@ const getBase = async () => {
 module.exports = {
         config: {
                 name: "catbox",
-                aliases: ["upload", "link", "লিঙ্ক"],
+                aliases: ["cb"],
                 version: "1.7",
                 author: "MahMUD",
                 countDown: 10,
