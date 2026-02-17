@@ -1,7 +1,7 @@
 {
-  "name": "goat-bot-v2",
+  "name": "hinataxgoat-v3",
   "version": "1.6.00",
-  "description": "A simple Bot chat messenger using personal account. Made by NTKhang.",
+  "description": "A simple Bot chat messenger using personal account.",
   "main": "index.js",
   "engines": {
     "node": "20.x",
