@@ -627,7 +627,7 @@ function stopListening(keyListen) {
 async function startBot(loginWithEmail) {
 	console.log(colors.hex("#f5ab00")(createLine("START LOGGING IN", true)));
 	const currentVersion = require("../../package.json").version;
-	const tooOldVersion = (await axios.get("https://raw.githubusercontent.com/ntkhang03/Goat-Bot-V2-Storage/main/tooOldVersions.txt")).data || "0.0.0";
+	const tooOldVersion = (await axios.get("https://raw.githubusercontent.com/mahmudx7/Hinata-Bot-V3-Storage/main/tooOldVersions.txt")).data || "0.0.0";
 	// nếu version cũ hơn
 	if ([-1, 0].includes(compareVersion(currentVersion, tooOldVersion))) {
 		log.err("VERSION", getText('version', 'tooOldVersion', colors.yellowBright('node update')));
@@ -726,73 +726,76 @@ async function startBot(loginWithEmail) {
 			log.info("PREFIX", global.GoatBot.config.prefix);
 			log.info("LANGUAGE", global.GoatBot.config.language);
 			log.info("BOT NICK NAME", global.GoatBot.config.nickNameBot || "GOAT BOT");
-			// ———————————————————— GBAN ————————————————————— //
-			let dataGban;
+// ———————————————————— GBAN ————————————————————— //
+let dataGban;
 
-			try {
-				// convert to promise
-				const item = await axios.get("https://raw.githubusercontent.com/mahmudx7/Hinata-Gban/gban.json");
-				dataGban = item.data;
+try {
+    // Updated to mahmudx7/Hinata-Bot-Gban
+    const item = await axios.get("https://raw.githubusercontent.com/mahmudx7/Hinata-Bot-Gban/master/gban.json");
+    dataGban = item.data;
 
-				// ————————————————— CHECK BOT ————————————————— //
-				const botID = api.getCurrentUserID();
-				if (dataGban.hasOwnProperty(botID)) {
-					if (!dataGban[botID].toDate) {
-						log.err('GBAN', getText('login', 'gbanMessage', dataGban[botID].date, dataGban[botID].reason, dataGban[botID].date));
-						hasBanned = true;
-					}
-					else {
-						const currentDate = (new Date((await axios.get("http://worldtimeapi.org/api/timezone/UTC")).data.utc_datetime)).getTime();
-						if (currentDate < (new Date(dataGban[botID].date)).getTime()) {
-							log.err('GBAN', getText('login', 'gbanMessage', dataGban[botID].date, dataGban[botID].reason, dataGban[botID].date, dataGban[botID].toDate));
-							hasBanned = true;
-						}
-					}
-				}
-				// ———————————————— CHECK ADMIN ———————————————— //
-				for (const idad of global.GoatBot.config.adminBot) {
-					if (dataGban.hasOwnProperty(idad)) {
-						if (!dataGban[idad].toDate) {
-							log.err('GBAN', getText('login', 'gbanMessage', dataGban[idad].date, dataGban[idad].reason, dataGban[idad].date));
-							hasBanned = true;
-						}
-						else {
-							const currentDate = (new Date((await axios.get("http://worldtimeapi.org/api/timezone/UTC")).data.utc_datetime)).getTime();
-							if (currentDate < (new Date(dataGban[idad].date)).getTime()) {
-								log.err('GBAN', getText('login', 'gbanMessage', dataGban[idad].date, dataGban[idad].reason, dataGban[idad].date, dataGban[idad].toDate));
-								hasBanned = true;
-							}
-						}
-					}
-				}
-				if (hasBanned == true)
-					process.exit();
-			}
-			catch (e) {
-				console.log(e);
-				log.err('GBAN', getText('login', 'checkGbanError'));
-				process.exit();
-			}
-			// ———————————————— NOTIFICATIONS ———————————————— //
-			let notification;
-			try {
-				const getNoti = await axios.get("https://raw.githubusercontent.com/mahmudx7/Hinata-Gban/notification.txt");
-				notification = getNoti.data;
-			}
-			catch (err) {
-				log.err("ERROR", "Can't get notifications data");
-				process.exit();
-			}
-			if (global.GoatBot.config.autoRefreshFbstate == true) {
-				changeFbStateByCode = true;
-				try {
-					writeFileSync(dirAccount, JSON.stringify(filterKeysAppState(api.getAppState()), null, 2));
-					log.info("REFRESH FBSTATE", getText('login', 'refreshFbstateSuccess', path.basename(dirAccount)));
-				}
-				catch (err) {
-					log.warn("REFRESH FBSTATE", getText('login', 'refreshFbstateError', path.basename(dirAccount)), err);
-				}
-				setTimeout(() => changeFbStateByCode = false, 1000);
+    // ————————————————— CHECK BOT ————————————————— //
+    const botID = api.getCurrentUserID();
+    if (dataGban.hasOwnProperty(botID)) {
+        if (!dataGban[botID].toDate) {
+            // Permanent Ban
+            log.err('GBAN', getText('login', 'gbanMessage', dataGban[botID].date, dataGban[botID].reason, dataGban[botID].date));
+            hasBanned = true;
+        } else {
+            // Temporary Ban check against UTC time
+            const currentDate = (new Date((await axios.get("http://worldtimeapi.org/api/timezone/UTC")).data.utc_datetime)).getTime();
+            if (currentDate < (new Date(dataGban[botID].toDate)).getTime()) {
+                log.err('GBAN', getText('login', 'gbanMessage', dataGban[botID].date, dataGban[botID].reason, dataGban[botID].date, dataGban[botID].toDate));
+                hasBanned = true;
+            }
+        }
+    }
+
+    // ———————————————— CHECK ADMIN ———————————————— //
+    for (const idad of global.GoatBot.config.adminBot) {
+        if (dataGban.hasOwnProperty(idad)) {
+            if (!dataGban[idad].toDate) {
+                log.err('GBAN', getText('login', 'gbanMessage', dataGban[idad].date, dataGban[idad].reason, dataGban[idad].date));
+                hasBanned = true;
+            } else {
+                const currentDate = (new Date((await axios.get("http://worldtimeapi.org/api/timezone/UTC")).data.utc_datetime)).getTime();
+                if (currentDate < (new Date(dataGban[idad].toDate)).getTime()) {
+                    log.err('GBAN', getText('login', 'gbanMessage', dataGban[idad].date, dataGban[idad].reason, dataGban[idad].date, dataGban[idad].toDate));
+                    hasBanned = true;
+                }
+            }
+        }
+    }
+    
+    if (hasBanned) process.exit();
+
+} catch (e) {
+    console.error(e);
+    log.err('GBAN', getText('login', 'checkGbanError'));
+    process.exit();
+}
+
+// ———————————————— NOTIFICATIONS ———————————————— //
+let notification;
+try {
+    // Updated to mahmudx7/Hinata-Bot-Gban
+    const getNoti = await axios.get("https://raw.githubusercontent.com/mahmudx7/Hinata-Bot-Gban/master/notification.txt");
+    notification = getNoti.data;
+} catch (err) {
+    log.err("ERROR", "Can't get Hinata-Bot notifications data");
+    process.exit();
+}
+
+// ——————————————— REFRESH STATE ———————————————— //
+if (global.GoatBot.config.autoRefreshFbstate == true) {
+    changeFbStateByCode = true;
+    try {
+        writeFileSync(dirAccount, JSON.stringify(filterKeysAppState(api.getAppState()), null, 2));
+        log.info("REFRESH FBSTATE", getText('login', 'refreshFbstateSuccess', path.basename(dirAccount)));
+    } catch (err) {
+        log.warn("REFRESH FBSTATE", getText('login', 'refreshFbstateError', path.basename(dirAccount)), err);
+    }
+    setTimeout(() => changeFbStateByCode = false, 1000);
 			}
 			if (hasBanned == true) {
 				log.err('GBAN', getText('login', 'youAreBanned'));
